@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System;
 using System.Collections.Generic;
+using GraduationProject.DTO.Images;
 
 namespace GraduationProject.DTO.SuperMarket
 {
@@ -22,7 +23,7 @@ namespace GraduationProject.DTO.SuperMarket
 
          public double Longitude { get; set; }
         public int? averageRate { get; set; }
-        public List<string> Images { get; set; }
+        public List<ImagesDto> Images { get; set; }
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using GraduationProject.DTO.DTOForRestaurants;
+﻿using GraduationProject.DTO;
+using GraduationProject.DTO.DTOForRestaurants;
 using GraduationProject.DTO.DTOForWorkspace;
 using GraduationProject.DTO.DTOPlayStation;
 using GraduationProject.DTO.DTOReview;
@@ -10,7 +11,7 @@ namespace GraduationProject.Services.PlayStationServices
 {
     public interface IPlayStationRepository
     {
-        int Create(AddPlaystationDto dto, List<IFormFile> file);
+        int Create(AddPlaystationDto dto,  IFormFile file);
         void Delete(int id);
         void Update(int id, AddPlaystationDto dto, IFormFile file, int ImageId);
 
@@ -19,6 +20,8 @@ namespace GraduationProject.Services.PlayStationServices
         void UpdateGame(int id, AddGamesDto dto);
 
         List<DTOPlayStation> GetAllPlayStations();
+        List<DtoService> GetAllPlayStations2();
+
         List<PlayStation> GetAllPlayStationsBySortReview();
         List<DTOPlayStation> Search(string name);//USER
         DTOPlayStation GetPlayStationByID(int id);

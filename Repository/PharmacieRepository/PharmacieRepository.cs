@@ -1,4 +1,5 @@
-﻿using GraduationProject.DTO.DTOForDoctors;
+﻿using GraduationProject.DTO;
+using GraduationProject.DTO.DTOForDoctors;
 using GraduationProject.DTO.DTOPharmacies;
 using GraduationProject.DTO.DTOReview;
 using GraduationProject.DTO.Images;
@@ -48,14 +49,17 @@ namespace GraduationProject.Repository.PharmacieRepository
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == pharmacie.Id).
                     Where(i => i.serviceName == pharmacie.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
-                  
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-         
-                dTOPharmacie.Images = imagesDto;
+                dTOPharmacie.Images = imagesDtos;
                 dTOPharmacies.Add(dTOPharmacie);
             }
             return dTOPharmacies;
@@ -85,14 +89,56 @@ namespace GraduationProject.Repository.PharmacieRepository
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == pharmacie.Id).
                     Where(i => i.serviceName == pharmacie.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
-                {
-                   
-                    HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
-                }
 
-                dTOPharmacie.Images = imagesDto;
+                {
+                    ImagesDto imageDto = new ImagesDto();
+                    HttpContext httpContext = httpContextAccessor.HttpContext;
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
+                }
+                dTOPharmacie.Images = imagesDtos;
+                dTOPharmacies.Add(dTOPharmacie);
+            }
+            return dTOPharmacies;
+        }
+        public List<DtoService> GetAllPlayPharmacies2()
+        {
+            List<Pharmacies> pharmacies = context.pharmacies.ToList();
+            if (!pharmacies.Any())
+                return null;
+            List<DtoService> dTOPharmacies = new List<DtoService>();
+            foreach (var pharmacie in pharmacies)
+            {
+                DtoService dTOPharmacie = new DtoService();
+                dTOPharmacie.Name = pharmacie.Name;
+                dTOPharmacie.City = pharmacie.City;
+                dTOPharmacie.Street = pharmacie.Street;
+                dTOPharmacie.StartWork = pharmacie.StartWork;
+                dTOPharmacie.EndWork = pharmacie.EndWork;
+                dTOPharmacie.PhoneNumber = pharmacie.PhoneNumber;
+                dTOPharmacie.DescriptionOfPlace = pharmacie.DescriptionOfPlace;
+                dTOPharmacie.LinkOfPlace = pharmacie.LinkOfPlace;
+                dTOPharmacie.Longitude = pharmacie.Longitude;
+                dTOPharmacie.Latitude = pharmacie.Latitude;
+                dTOPharmacie.id = pharmacie.Id;
+
+                List<string> imagesDto = new List<string>();
+                List<Images> imgs = context.images.Where(i => i.ServicId == pharmacie.Id).
+                    Where(i => i.serviceName == pharmacie.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
+                foreach (var img in imgs)
+
+                {
+                    ImagesDto imageDto = new ImagesDto();
+                    HttpContext httpContext = httpContextAccessor.HttpContext;
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
+                }
+                dTOPharmacie.Images = imagesDtos;
                 dTOPharmacies.Add(dTOPharmacie);
             }
             return dTOPharmacies;
@@ -169,15 +215,17 @@ namespace GraduationProject.Repository.PharmacieRepository
             List<string> imagesDto = new List<string>();
             List<Images> imgs = context.images.Where(i => i.ServicId == pharmacie.Id).
                 Where(i => i.serviceName == pharmacie.Name).ToList();
+            List<ImagesDto> imagesDtos = new List<ImagesDto>();
             foreach (var img in imgs)
-            {
-                //  ImagesDto imageDto = new ImagesDto();
-                // imageDto.Image = img.Image;
-                HttpContext httpContext = httpContextAccessor.HttpContext;
-                imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
-            }
 
-            dTOPharmacie.Images = imagesDto;
+            {
+                ImagesDto imageDto = new ImagesDto();
+                HttpContext httpContext = httpContextAccessor.HttpContext;
+                imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                imageDto.id = img.Id;
+                imagesDtos.Add(imageDto);
+            }
+            dTOPharmacie.Images = imagesDtos;
             return dTOPharmacie;
          
         }
@@ -209,15 +257,17 @@ namespace GraduationProject.Repository.PharmacieRepository
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == pharmacie.Id).
                     Where(i => i.serviceName == pharmacie.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
-                {
-                    //  ImagesDto imageDto = new ImagesDto();
-                    // imageDto.Image = img.Image;
-                    HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
-                }
 
-                dTOPharmacie.Images = imagesDto;
+                {
+                    ImagesDto imageDto = new ImagesDto();
+                    HttpContext httpContext = httpContextAccessor.HttpContext;
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
+                }
+                dTOPharmacie.Images = imagesDtos;
                 dTOPharmacies.Add(dTOPharmacie);
             }
             return dTOPharmacies;
@@ -276,7 +326,7 @@ namespace GraduationProject.Repository.PharmacieRepository
 
        
         //Add,,Update,Delete.......................................................................
-        public int Create(AddPharmacieDto dto, List<IFormFile> imageFiles)
+        public int Create(AddPharmacieDto dto,  IFormFile file)
         {
             Pharmacies pharmacie = new Pharmacies();
             pharmacie.Name = dto.Name;
@@ -291,10 +341,9 @@ namespace GraduationProject.Repository.PharmacieRepository
             pharmacie.Latitude = dto.Latitude;
             context.pharmacies.Add(pharmacie);
             context.SaveChanges();
-
-            List<Images> images = new List<Images>();
-            foreach (var file in imageFiles)
+            if (file != null)
             {
+                List<Images> images = new List<Images>();
                 string fileName = file.FileName;
                 string filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\imgs"));
                 using (var fileStream = new FileStream(Path.Combine(filePath, fileName), FileMode.Create))
@@ -309,7 +358,7 @@ namespace GraduationProject.Repository.PharmacieRepository
                 context.SaveChanges();
                 images.Add(image);
             }
-             return pharmacie.Id;
+              return pharmacie.Id;
 
         }
 

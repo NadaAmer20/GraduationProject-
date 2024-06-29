@@ -1,4 +1,5 @@
-﻿using GraduationProject.DTO.DTOForWorkspace;
+﻿using GraduationProject.DTO;
+using GraduationProject.DTO.DTOForWorkspace;
 using GraduationProject.DTO.DTOPharmacies;
 using GraduationProject.DTO.DTOReview;
 using GraduationProject.Models;
@@ -10,13 +11,15 @@ namespace GraduationProject.Services.PharmaciesServices
     public interface IPharmaciesServices
     {
         List<DTOOPharmacie> GetAllPlayPharmacies();
+        List<DtoService> GetAllPlayPharmacies2();
+
         List<Pharmacies> GetAllPlayPharmaciesBySortReview();
 
 
        List< DTOOPharmacie> Search(string name);//USER
         DTOOPharmacie GetPharmacieByID(int id);
         List<DTOOPharmacie> GetAllPharmaciesActiveNow();//USER
-        int Create(AddPharmacieDto dto, List<IFormFile> file);
+        int Create(AddPharmacieDto dto, IFormFile file);
         void Delete(int id);
         void Update(int id,AddPharmacieDto dto, IFormFile file, int ImageId);//, IFormFile file);
         int CreateReview(string UserId, int WorkspaceId, DTOReview dTOReview);

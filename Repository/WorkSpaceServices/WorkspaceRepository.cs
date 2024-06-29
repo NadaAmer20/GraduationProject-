@@ -1,4 +1,5 @@
-﻿using GraduationProject.DTO.DTOForWorkspace;
+﻿using GraduationProject.DTO;
+using GraduationProject.DTO.DTOForWorkspace;
 using GraduationProject.DTO.DTOReview;
 using GraduationProject.DTO.Images;
 using GraduationProject.Models;
@@ -31,6 +32,7 @@ namespace GraduationProject.Services.WorkSpaceServices
             if (!workspaces.Any())
                 return null;
             List<DTOOWorkspace> dTOWorkspaces = new List<DTOOWorkspace>();
+
             foreach (var workspace in workspaces)
             {
                 DTOOWorkspace dTOWorkspace = new DTOOWorkspace();
@@ -45,23 +47,61 @@ namespace GraduationProject.Services.WorkSpaceServices
                 dTOWorkspace.Latitude = workspace.Latitude;
                 dTOWorkspace.Longitude = workspace.Longitude;
                 dTOWorkspace.id = workspace.Id;
-                List<string> imagesDto = new List<string>();
-                List<Images> imgs = context.images.Where(i => i.ServicId == workspace.Id).
+                 List<Images> imgs = context.images.Where(i => i.ServicId == workspace.Id).
                     Where(i => i.serviceName == workspace.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
 
                 {
-                    //  ImagesDto imageDto = new ImagesDto();
-                    // imageDto.Image = img.Image;
+                     ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTOWorkspace.Images = imagesDto;
+                dTOWorkspace.Images = imagesDtos;
                 dTOWorkspaces.Add(dTOWorkspace);
             }
             return dTOWorkspaces;
         }
+        public List<DtoService> GetAllWorkspacs2()
+        {
+            List<Workspace> workspaces = context.workspaces.ToList();
+            if (!workspaces.Any())
+                return null;
+            List<DtoService> dTOWorkspaces = new List<DtoService>();
 
+            foreach (var workspace in workspaces)
+            {
+                DtoService dTOWorkspace = new DtoService();
+                dTOWorkspace.Name = workspace.Name;
+                dTOWorkspace.PhoneNumber = workspace.PhoneNumber;
+                dTOWorkspace.City = workspace.City;
+                dTOWorkspace.Street = workspace.Street;
+                dTOWorkspace.DescriptionOfPlace = workspace.DescriptionOfPlace;
+                dTOWorkspace.LinkOfPlace = workspace.LinkOfPlace;
+                dTOWorkspace.StartWork = workspace.StartWork;
+                dTOWorkspace.EndWork = workspace.EndWork;
+                dTOWorkspace.Latitude = workspace.Latitude;
+                dTOWorkspace.Longitude = workspace.Longitude;
+                dTOWorkspace.id = workspace.Id;
+                List<Images> imgs = context.images.Where(i => i.ServicId == workspace.Id).
+                   Where(i => i.serviceName == workspace.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
+                foreach (var img in imgs)
+
+                {
+                    ImagesDto imageDto = new ImagesDto();
+                    HttpContext httpContext = httpContextAccessor.HttpContext;
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
+                }
+                dTOWorkspace.Images = imagesDtos;
+                dTOWorkspaces.Add(dTOWorkspace);
+            }
+            return dTOWorkspaces;
+        }
         public List<DTOOWorkspace> GetAllWorkspacesActiveNow()
         {
             DateTime now = DateTime.Now;
@@ -87,14 +127,17 @@ namespace GraduationProject.Services.WorkSpaceServices
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == workspace.Id).
                     Where(i => i.serviceName == workspace.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
-                    //  ImagesDto imageDto = new ImagesDto();
-                    // imageDto.Image = img.Image;
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTOWorkspace.Images = imagesDto;
+                dTOWorkspace.Images = imagesDtos;
                 dTOWorkspaces.Add(dTOWorkspace);
             }
             return dTOWorkspaces;
@@ -146,15 +189,18 @@ namespace GraduationProject.Services.WorkSpaceServices
             List<string> imagesDto = new List<string>();
             List<Images> imgs = context.images.Where(i => i.ServicId == workspace.Id).
                 Where(i => i.serviceName == workspace.Name).ToList();
+            List<ImagesDto> imagesDtos = new List<ImagesDto>();
             foreach (var img in imgs)
+
             {
-                //  ImagesDto imageDto = new ImagesDto();
-                // imageDto.Image = img.Image;
+                ImagesDto imageDto = new ImagesDto();
                 HttpContext httpContext = httpContextAccessor.HttpContext;
-                imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                imageDto.id = img.Id;
+                imagesDtos.Add(imageDto);
             }
-            dTOWorkspace.Images = imagesDto;
-            return dTOWorkspace;
+            dTOWorkspace.Images = imagesDtos;
+             return dTOWorkspace;
         }
 
         public List<DTOOWorkspace> Search (string name)
@@ -182,21 +228,24 @@ namespace GraduationProject.Services.WorkSpaceServices
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == workspace.Id).
                     Where(i => i.serviceName == workspace.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
-                    //  ImagesDto imageDto = new ImagesDto();
-                    // imageDto.Image = img.Image;
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTOWorkspace.Images = imagesDto;
+                dTOWorkspace.Images = imagesDtos;
                 dTOWorkspaces.Add(dTOWorkspace);
             }
             return dTOWorkspaces;
         }
         //Add,,Update,Delete FOR WorkSpace......................................................................
 
-        public int Create(AddWorkspaceDto dTOWorkspace, List<IFormFile> imageFiles)
+        public int Create(AddWorkspaceDto dTOWorkspace, IFormFile file)
         {
             Workspace workspace = new Workspace();
             workspace.Name = dTOWorkspace.Name;
@@ -211,7 +260,7 @@ namespace GraduationProject.Services.WorkSpaceServices
             workspace.Longitude = dTOWorkspace.Longitude;
             context.workspaces.Add(workspace);
             context.SaveChanges();
-            foreach (var file in imageFiles)
+            if (file != null)
             {
                 string fileName = file.FileName;
                 string filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\imgs"));
@@ -226,7 +275,7 @@ namespace GraduationProject.Services.WorkSpaceServices
                 context.images.Add(image);
                 context.SaveChanges();
             }
-            return workspace.Id;
+             return workspace.Id;
         }
 
         public void Delete(int id)

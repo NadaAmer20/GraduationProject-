@@ -30,28 +30,29 @@ namespace GraduationProject.Controllers
         //Create,,delete,,update ....................................................................................
         [Authorize(Roles = "Admin")]
         [HttpPost("CreateAnalysisCenter")]
-        public ActionResult CreateAnalysisCenter([FromBody] AddAnalysisCentersDto Service, List<IFormFile> files)//,  IFormFile file)
+        public ActionResult CreateAnalysisCenter([FromForm] AddAnalysisCentersDto Service, IFormFile files)//,  IFormFile file)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             analysisCentersServices.Create(Service, files);
-            return Ok("Add Done");
+            return new JsonResult(new { message = "تمت الاضافه بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("UpdateAnalysisCenter")]
-        public ActionResult UpdateAnalysisCenter(int id, [FromBody] AddAnalysisCentersDto Service, IFormFile file, int ImageId)//, IFormFile file)
+        public ActionResult UpdateAnalysisCenter(int id, [FromForm] AddAnalysisCentersDto Service, IFormFile file, int ImageId)//, IFormFile file)
         {
             analysisCentersServices.Update(id, Service, file, ImageId);
-            return Ok("Update AnalysisCenter Done");
-        }
+            return new JsonResult(new { message = "تم التعديل بنجاح" });
+
+         }
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("DeleteAnalysisCenter")]
         public ActionResult DeleteAnalysisCenter(int id)
         {
             analysisCentersServices.Delete(id);
-            return Ok("Delete AnalysisCenter Done");
+            return new JsonResult(new { message = "تم الحذف بنجاح" });
         }
         //...............................................................................
         [HttpGet("GetAllAnalysisCenters")]
@@ -63,6 +64,14 @@ namespace GraduationProject.Controllers
             return Ok(analysisCenters);
         }
 
+        [HttpGet("GetAllAnalysisCenters2")]
+        public IActionResult GetAllAnalysisCenters2()
+        {
+            var analysisCenters = analysisCentersServices.GetAllAnalysisCenters2();
+            if (!analysisCenters.Any())
+                return BadRequest("There is No Data");
+            return Ok(analysisCenters);
+        }
 
         [HttpGet("GetAnalysisCenterById")]
         public IActionResult GetAnalysisCenterById(int id)
@@ -75,9 +84,9 @@ namespace GraduationProject.Controllers
 
 
 
-        [HttpPost("Search")]
+        [HttpGet("Search")]
         //  [Authorize(Roles = UserRoles.Admin )]
-        public ActionResult Search([FromForm] string name)
+        public ActionResult Search(   string name)
         {
             var analysisCenter = analysisCentersServices.Search(name);
             if (analysisCenter == null)

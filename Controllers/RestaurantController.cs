@@ -29,50 +29,50 @@ namespace GraduationProject.Controllers
         }
 
         //Add,,Delete,,Update............................................................................
-        [HttpPost("Create  Restaurant")]
+        [HttpPost("CreateRestaurant")]
         [Authorize(Roles = "Admin")]
-        public ActionResult CreateRestaurant([FromBody] AddRestaurantDto restaurantDto, List<IFormFile> imageFiles)
+        public ActionResult CreateRestaurant([FromForm] AddRestaurantDto restaurantDto,  IFormFile imageFiles)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             _restaurantService.Create(restaurantDto,imageFiles);
-            return Ok("Add Done");
+            return new JsonResult(new { message = "تمت الاضافه بنجاح" });
         }
         [Authorize(Roles = "Admin")]
         [HttpPut("UpdateRestaurant")]
-        public ActionResult Update(int id, [FromBody] AddRestaurantDto dto, IFormFile file, int ImageId)
+        public ActionResult Update(int id, [FromForm] AddRestaurantDto dto, IFormFile file, int ImageId)
         {
-            _restaurantService.Update(id, dto, file, ImageId); 
-            return Ok("Update Resturant Done");
+            _restaurantService.Update(id, dto, file, ImageId);
+            return new JsonResult(new { message = "تم التعديل بنجاح" });
         }
         [Authorize(Roles = "Admin")]
         [HttpDelete("DeleteRestaurant")]
         public ActionResult Delete( int id)
         {
             _restaurantService.Delete(id);
-            return Ok("Delete Restaurant Done");
+            return new JsonResult(new { message = "تم الحذف بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPost("CreateMenuItemForRestaurant")]
-        public ActionResult CreateMenuItemForRestaurant([FromBody] AddMenuItemsDto dto)
+        public ActionResult CreateMenuItemForRestaurant( [FromForm] AddMenuItemsDto dto)
         {
             _restaurantService.CreateMenuForRest(dto);
-            return Ok("Add Done");
+            return new JsonResult(new { message = "تمت الاضافه بنجاح" });
         }
         [Authorize(Roles = "Admin")]
         [HttpPut("UpdateMenuItemForRestaurant")]
-        public ActionResult UpdateMenuItemForRestaurant(int id, [FromBody] AddMenuItemsDto dto)
+        public ActionResult UpdateMenuItemForRestaurant(int id, [FromForm]  AddMenuItemsDto dto)
         {
             _restaurantService.UpdateMenuItem(id,dto);
-            return Ok("Update  Done");
+            return new JsonResult(new { message = "تم التعديل بنجاح" });
         }
         [HttpDelete("DeleteMenuItemForRestaurant")]
         [Authorize(Roles = "Admin")]
         public ActionResult DeleteMenuItemForRestaurant( int id)
         {
             _restaurantService.DeleteMenu(id);
-            return Ok("Delete Done");
+            return new JsonResult(new { message = "تم الحذف بنجاح" });
         }
 
         //.......................................................................................
@@ -84,6 +84,15 @@ namespace GraduationProject.Controllers
                 return BadRequest("There is No Data");
             return Ok(restaurants);
  
+        }
+        [HttpGet("GetAllRestaurants2")]
+        public IActionResult GetAllRestaurants2()
+        {
+            var restaurants = _restaurantService.getAll2();
+            if (restaurants == null)
+                return BadRequest("There is No Data");
+            return Ok(restaurants);
+
         }
         [HttpGet("GetAllRestaurantsBySortReview")]
         public IActionResult GetAllRestaurantsBySortReview()
@@ -104,8 +113,8 @@ namespace GraduationProject.Controllers
         }
 
 
-        [HttpPost("Search")]
-        public ActionResult<RestaurantDto> Search([FromForm] string name)
+        [HttpGet("Search")]
+        public ActionResult<RestaurantDto> Search(  string name)
         {
            var restaurant = _restaurantService.Search(name);
             if (restaurant == null)

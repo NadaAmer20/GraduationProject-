@@ -20,6 +20,6 @@ namespace GraduationProject.DTO.DTOPlayStation
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public List<DTOGames> dTOGames { get; set; }
-        public List<string> Images { get; set; }
+        public List<ImagesDto> Images { get; set; }
     }
 }

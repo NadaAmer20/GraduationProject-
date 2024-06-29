@@ -26,7 +26,7 @@ namespace GraduationProject.DTO.AnalysisCentersDto
         public string? LinkOfPlace { get; set; }
 
  
-        [RegularExpression(@"^\d{10}$", ErrorMessage = "Invalid phone number format")]
+       [RegularExpression(@"^\d{11}$", ErrorMessage = "Invalid phone number format")]
         public string PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Start Work date is required")]

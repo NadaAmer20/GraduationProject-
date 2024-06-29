@@ -31,7 +31,7 @@ namespace GraduationProject.DTO.DTOForRestaurants
 
         //   public List<DTOCategory> dTOCategories { get; set; }
         public List<MenuItemsDto> menuItems { get; set; }
-        public List<string> Images { get; set; }
+        public List<ImagesDto> Images { get; set; }
 
     }
 }

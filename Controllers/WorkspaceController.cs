@@ -28,20 +28,20 @@ namespace GraduationProject.Controllers
         // [Authorize(Roles = "Admin")]
         [HttpPost("CreateWorkspace")]
         [Authorize(Roles = "Admin")]
-        public ActionResult CreateWorkspace([FromBody] AddWorkspaceDto workspace, List<IFormFile> files)//,  IFormFile file)
+        public ActionResult CreateWorkspace([FromForm] AddWorkspaceDto workspace, IFormFile files)//,  IFormFile file)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             workspaceRepository.Create(workspace, files);
-            return Ok("Add Done");
+            return new JsonResult(new { message = "تمت الاضافه بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("UpdateWorkspace")]
-        public ActionResult Update(int id, [FromBody] AddWorkspaceDto workspace, IFormFile file, int ImageId)//, IFormFile file)
+        public ActionResult Update(int id, [FromForm] AddWorkspaceDto workspace, IFormFile file, int ImageId)//, IFormFile file)
         {
             workspaceRepository.Update(id, workspace, file, ImageId);//,file);
-            return Ok("Update Workspace Done");
+            return new JsonResult(new { message = "تم التعديل بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
@@ -50,7 +50,7 @@ namespace GraduationProject.Controllers
         {
             workspaceRepository.Delete(id);
 
-            return Ok("Delete Workspace Done");
+            return new JsonResult(new { message = "تم الحذف بنجاح" });
         }
         //......................................................................................................................
         [HttpGet("GetAllWorkspaces")]
@@ -61,6 +61,15 @@ namespace GraduationProject.Controllers
                 return BadRequest("There is No Data");
             return Ok(dTOWorkspaces);
         }
+        [HttpGet("GetAllWorkspaces2")]
+        public IActionResult GetAllWorkspaces2()
+        {
+            var dTOWorkspaces = workspaceRepository.GetAllWorkspacs2();
+            if (dTOWorkspaces == null)
+                return BadRequest("There is No Data");
+            return Ok(dTOWorkspaces);
+        }
+
 
 
         [HttpGet("GetWorkspaceById")]
@@ -76,7 +85,7 @@ namespace GraduationProject.Controllers
 
         [HttpPost("Search")]
         //  [Authorize(Roles = UserRoles.Admin )]
-        public ActionResult Search([FromForm] string name)
+        public ActionResult Search(  string name)
         {
             var dTOWorkspace = workspaceRepository.Search(name);
             if (dTOWorkspace== null)

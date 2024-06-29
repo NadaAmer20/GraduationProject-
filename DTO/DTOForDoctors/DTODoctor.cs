@@ -28,6 +28,6 @@ namespace GraduationProject.DTO.DTOForDoctors
         public double Longitude { get; set; }
         public int? AvrageRate { get; set; }
 
-        public List<string> Images { get; set; }
+        public List<ImagesDto> Images { get; set; }
     }
 }

@@ -30,20 +30,20 @@ namespace GraduationProject.Controllers
         //create,,delete,,update for pharmacie.....................................................................................
         [Authorize(Roles = "Admin")]
         [HttpPost("CreatePharmacie")]
-        public ActionResult CreatePharmacie([FromBody] AddPharmacieDto dTOPharmacie, List<IFormFile> files)//,  IFormFile file)
+        public ActionResult CreatePharmacie([FromForm] AddPharmacieDto dTOPharmacie,   IFormFile files)//,  IFormFile file)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             pharmaciesServices.Create(dTOPharmacie, files);
-            return Ok("Add Done");
+            return new JsonResult(new { message = "تمت الاضافه بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("UpdatePharmacie")]
-        public ActionResult UpdatePharmacie(int id,  [FromBody] AddPharmacieDto dTOPharmacie, IFormFile file, int ImageId)
+        public ActionResult UpdatePharmacie(int id, [FromForm] AddPharmacieDto dTOPharmacie, IFormFile file, int ImageId)
         {
             pharmaciesServices.Update(id, dTOPharmacie, file, ImageId);
-            return Ok("Update Pharmacie Done");
+            return new JsonResult(new { message = "تم التعديل بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
@@ -52,7 +52,7 @@ namespace GraduationProject.Controllers
         {
             pharmaciesServices.Delete(id);
 
-            return Ok("Delete Pharmacie Done");
+            return new JsonResult(new { message = "تم الحذف بنجاح" });
         }
 
         //................................................................
@@ -64,7 +64,14 @@ namespace GraduationProject.Controllers
                 return BadRequest("There is No Data");
             return Ok(pharmacies);
         }
-
+        [HttpGet("GetAllPharmacies2")]
+        public IActionResult GetAllPharmacies2()
+        {
+           var pharmacies = pharmaciesServices.GetAllPlayPharmacies2();
+            if (pharmacies == null)
+                return BadRequest("There is No Data");
+            return Ok(pharmacies);
+        }
         [HttpGet("GetAllPharmaciesBySortReview")]
         public IActionResult GetAllPharmaciesBySortReview()
         {
@@ -74,7 +81,7 @@ namespace GraduationProject.Controllers
             return Ok(pharmacies);
         }
 
-        [HttpPost("GetPharmacieById")]//route
+        [HttpGet("GetPharmacieById")]//route
         //  [Authorize(Roles = UserRoles.Admin )]
         public ActionResult GetPharmacieById(int id)
         {
@@ -85,9 +92,9 @@ namespace GraduationProject.Controllers
         }
 
 
-        [HttpPost("Search")]
+        [HttpGet("Search")]
         //  [Authorize(Roles = UserRoles.Admin )]
-        public ActionResult Search([FromForm] string name)
+        public ActionResult Search(  string name)
         {
             var pharmacie = pharmaciesServices.Search(name) ;
             if (pharmacie == null)

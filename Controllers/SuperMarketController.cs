@@ -29,20 +29,20 @@ namespace GraduationProject.Controllers
         //Create,,delete,,update ....................................................................................
          [HttpPost("CreateSupermarket")]
         [Authorize(Roles = "Admin")]
-        public ActionResult CreateSupermarket([FromBody] AddSupermarketDto Service, List<IFormFile> files)//,  IFormFile file)
+        public ActionResult CreateSupermarket([FromForm] AddSupermarketDto Service,   IFormFile files)//,  IFormFile file)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             superMarketServices.Create(Service, files);
-            return Ok("Add Done");
+            return new JsonResult(new { message = "تمت الاضافه بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("UpdateSupermarket")]
-        public ActionResult UpdateSupermarket(int id, [FromBody] AddSupermarketDto Service, IFormFile file, int ImageId)//, IFormFile file)
+        public ActionResult UpdateSupermarket(int id, [FromForm] AddSupermarketDto Service, IFormFile file, int ImageId)//, IFormFile file)
         {
             superMarketServices.Update(id, Service, file, ImageId);
-            return Ok("Update Supermarket Done");
+            return new JsonResult(new { message = "تم التعديل بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
@@ -51,7 +51,7 @@ namespace GraduationProject.Controllers
         {
             superMarketServices.Delete(id);
 
-            return Ok("Delete Supermarket Done");
+            return new JsonResult(new { message = "تم الحذف بنجاح" });
         }
         //...........................................................................................
 
@@ -65,6 +65,14 @@ namespace GraduationProject.Controllers
         }
 
 
+        [HttpGet("GetAllSuperMarkets2")]
+        public IActionResult GetAllSuperMarkets2()
+        {
+            var superMarkets = superMarketServices.GetAllSuperMarket2();
+            if (superMarkets == null)
+                return BadRequest("There is No Data");
+            return Ok(superMarkets);
+        }
         [HttpGet("GetSuperMarketById")]
         public IActionResult GetWorkspaceById(int id)
         {
@@ -76,9 +84,9 @@ namespace GraduationProject.Controllers
 
 
 
-        [HttpPost("Search")]
+        [HttpGet("Search")]
         //  [Authorize(Roles = UserRoles.Admin )]
-        public ActionResult Search([FromForm] string name)
+        public ActionResult Search(  string name)
         {
             var superMarket  = superMarketServices.Search(name);
             if (superMarket == null)

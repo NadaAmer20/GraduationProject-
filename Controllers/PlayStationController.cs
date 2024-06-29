@@ -32,20 +32,20 @@ namespace GraduationProject.Controllers
         //Create,,delete,,update ....................................................................................
         [Authorize(Roles = "Admin")]
         [HttpPost("CreatePlayStation")]
-        public ActionResult CreatePlayStation([FromBody] AddPlaystationDto Service, List<IFormFile> files)//,  IFormFile file)
+        public ActionResult CreatePlayStation([FromForm] AddPlaystationDto Service,  IFormFile files)//,  IFormFile file)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             playStationRepository.Create(Service, files);
-            return Ok("Add Done");
+            return new JsonResult(new { message = "تمت الاضافه بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("UpdatePlayStation")]
-        public ActionResult UpdatePlayStation(int id, [FromBody] AddPlaystationDto Service, IFormFile file, int ImageId)//, IFormFile file)
+        public ActionResult UpdatePlayStation(int id, [FromForm] AddPlaystationDto Service, IFormFile file, int ImageId)//, IFormFile file)
         {
             playStationRepository.Update(id, Service, file, ImageId);
-            return Ok("Update PlayStation Done");
+            return new JsonResult(new { message = "تم التعديل بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
@@ -59,18 +59,18 @@ namespace GraduationProject.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost("CreateGameForPlaystation")]
-        public ActionResult CreateGame([FromBody] AddGamesDto game )
+        public ActionResult CreateGame([FromForm]  AddGamesDto game )
         {
             var id = playStationRepository.CreateGameForPlaystation(game);
-            return Ok("Add Done");
+            return new JsonResult(new { message = "تمت الاضافه بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("UpdateGameForPlaystation")]
-        public ActionResult UpdateGame(int id, [FromBody] AddGamesDto game ) 
+        public ActionResult UpdateGame(int id, [FromForm] AddGamesDto game ) 
         {
             playStationRepository.UpdateGame(id, game);
-            return Ok("Update Game Done");
+            return new JsonResult(new { message = "تم التعديل بنجاح" });
         }
         [Authorize(Roles = "Admin")]
         [HttpDelete("DeleteGameForPlaystation")]
@@ -78,7 +78,7 @@ namespace GraduationProject.Controllers
         {
             playStationRepository.DeleteGame(id);
 
-            return Ok("Delete Game  Done");
+            return new JsonResult(new { message = "تم الحذف بنجاح" });
         }
 
         //...........................................................................
@@ -86,6 +86,14 @@ namespace GraduationProject.Controllers
         public IActionResult GetAllPlayStations()
         {
             List<DTOPlayStation> dTOPlaaystations = playStationRepository.GetAllPlayStations();
+            if (!dTOPlaaystations.Any())
+                return BadRequest("There is No Data");
+            return Ok(dTOPlaaystations);
+        }
+        [HttpGet("GetAllPlayStations2")]
+        public IActionResult GetAllPlayStations2()
+        {
+             var dTOPlaaystations = playStationRepository.GetAllPlayStations2();
             if (!dTOPlaaystations.Any())
                 return BadRequest("There is No Data");
             return Ok(dTOPlaaystations);
@@ -108,9 +116,9 @@ namespace GraduationProject.Controllers
             return Ok(dTOPlaaystation);
         }
 
-        [HttpPost("Search")]
+        [HttpGet("Search")]
         //  [Authorize(Roles = UserRoles.Admin )]
-        public ActionResult Search([FromForm] string name)
+        public ActionResult Search( string name)
         {
 
             var dTOPlaaystation = playStationRepository.Search(name);

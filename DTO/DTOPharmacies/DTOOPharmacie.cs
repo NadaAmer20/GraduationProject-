@@ -25,6 +25,6 @@ namespace GraduationProject.DTO.DTOPharmacies
          public double Latitude { get; set; }
 
          public double Longitude { get; set; }
-        public List<string> Images { get; set; }
+        public List<ImagesDto> Images { get; set; }
     }
 }

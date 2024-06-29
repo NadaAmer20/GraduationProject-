@@ -1,5 +1,7 @@
-﻿using GraduationProject.DTO.DTOForWorkspace;
+﻿using GraduationProject.DTO;
+using GraduationProject.DTO.DTOForWorkspace;
 using GraduationProject.DTO.DTOReview;
+using GraduationProject.DTO.Images;
 using GraduationProject.DTO.SuperMarket;
 using GraduationProject.Models;
 using GraduationProject.Services.SuperMarketServices;
@@ -25,7 +27,7 @@ namespace GraduationProject.Repository.SuperMarketRepository
       
 
 
-        public int Create(AddSupermarketDto dto, List<IFormFile> imageFiles)
+        public int Create(AddSupermarketDto dto,  IFormFile file)
         {
             SuperMarket service = new SuperMarket();
             service.Name = dto.Name;
@@ -39,7 +41,7 @@ namespace GraduationProject.Repository.SuperMarketRepository
             service.Longitude = dto.Longitude;
             context.SuperMarkets.Add(service);
             context.SaveChanges();
-            foreach (var file in imageFiles)
+            if (file != null)
             {
                 string fileName = file.FileName;
                 string filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\imgs"));
@@ -54,7 +56,7 @@ namespace GraduationProject.Repository.SuperMarketRepository
                 context.images.Add(image);
                 context.SaveChanges();
             }
-            return service.Id;
+             return service.Id;
         }
 
         public void Delete(int id)
@@ -117,20 +119,59 @@ namespace GraduationProject.Repository.SuperMarketRepository
                 dTOSuperMarket.Longitude = superMarket.Longitude;
                 dTOSuperMarket.averageRate = superMarket.averageRate;
                 dTOSuperMarket.id = superMarket.Id;
-                List<string> imagesDto = new List<string>();
-                List<Images> imgs = context.images.Where(i => i.ServicId == superMarket.Id).
+                 List<Images> imgs = context.images.Where(i => i.ServicId == superMarket.Id).
                     Where(i => i.serviceName == superMarket.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTOSuperMarket.Images = imagesDto;
+                dTOSuperMarket.Images = imagesDtos;
+                dTOSuperMarkets.Add(dTOSuperMarket);
+             }
+            return dTOSuperMarkets;
+        }
+        public List<DtoService> GetAllSuperMarket2()
+        {
+            List<SuperMarket> superMarkets = context.SuperMarkets.ToList();
+            if (!superMarkets.Any())
+                return null;
+            List<DtoService> dTOSuperMarkets = new List<DtoService>();
+            foreach (var superMarket in superMarkets)
+            {
+                DtoService dTOSuperMarket = new DtoService();
+                dTOSuperMarket.Name = superMarket.Name;
+                dTOSuperMarket.PhoneNumber = superMarket.PhoneNumber;
+                dTOSuperMarket.City = superMarket.City;
+                dTOSuperMarket.Street = superMarket.Street;
+                dTOSuperMarket.DescriptionOfPlace = superMarket.DescriptionOfPlace;
+                dTOSuperMarket.StartWork = superMarket.StartWork;
+                dTOSuperMarket.EndWork = superMarket.EndWork;
+                dTOSuperMarket.Latitude = superMarket.Latitude;
+                dTOSuperMarket.Longitude = superMarket.Longitude;
+                dTOSuperMarket.id = superMarket.Id;
+                List<Images> imgs = context.images.Where(i => i.ServicId == superMarket.Id).
+                   Where(i => i.serviceName == superMarket.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
+                foreach (var img in imgs)
+
+                {
+                    ImagesDto imageDto = new ImagesDto();
+                    HttpContext httpContext = httpContextAccessor.HttpContext;
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
+                } 
+                dTOSuperMarket.Images = imagesDtos;
                 dTOSuperMarkets.Add(dTOSuperMarket);
             }
             return dTOSuperMarkets;
         }
-
         public List<SuperMarketDto> GetAllSuperMarketByReview()
         {
             List<SuperMarket> SuperMarkets = context.SuperMarkets.ToList();        
@@ -167,12 +208,17 @@ namespace GraduationProject.Repository.SuperMarketRepository
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == superMarket.Id).
                     Where(i => i.serviceName == superMarket.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTOSuperMarket.Images = imagesDto;
+                dTOSuperMarket.Images = imagesDtos;
                 dTOSuperMarkets.Add(dTOSuperMarket);
             }
             return dTOSuperMarkets;
@@ -203,12 +249,17 @@ namespace GraduationProject.Repository.SuperMarketRepository
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == superMarket.Id).
                     Where(i => i.serviceName == superMarket.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTOSuperMarket.Images = imagesDto;
+                dTOSuperMarket.Images = imagesDtos;
                 dTOSuperMarkets.Add(dTOSuperMarket);
             }
             return dTOSuperMarkets;
@@ -234,13 +285,18 @@ namespace GraduationProject.Repository.SuperMarketRepository
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == superMarket.Id).
                     Where(i => i.serviceName == superMarket.Name).ToList();
-                foreach (var img in imgs)
-                {
-                   HttpContext httpContext = httpContextAccessor.HttpContext;
-                   imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
-                }
-                dTOSuperMarket.Images = imagesDto;
-            return dTOSuperMarket;
+            List<ImagesDto> imagesDtos = new List<ImagesDto>();
+            foreach (var img in imgs)
+
+            {
+                ImagesDto imageDto = new ImagesDto();
+                HttpContext httpContext = httpContextAccessor.HttpContext;
+                imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                imageDto.id = img.Id;
+                imagesDtos.Add(imageDto);
+            }
+            dTOSuperMarket.Images = imagesDtos;
+             return dTOSuperMarket;
         }
 
         public List<SuperMarketDto> Search(string name)
@@ -268,13 +324,19 @@ namespace GraduationProject.Repository.SuperMarketRepository
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == superMarket.Id).
                     Where(i => i.serviceName == superMarket.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTOSuperMarket.Images = imagesDto;
+                dTOSuperMarket.Images = imagesDtos;
                 dTOSuperMarkets.Add(dTOSuperMarket);
+               
             }
             return dTOSuperMarkets;
         }

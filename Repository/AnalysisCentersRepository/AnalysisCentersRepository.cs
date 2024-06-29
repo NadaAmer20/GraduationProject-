@@ -1,6 +1,10 @@
-﻿using GraduationProject.DTO.AnalysisCentersDto;
+﻿using GraduationProject.DTO;
+using GraduationProject.DTO.AnalysisCentersDto;
+using GraduationProject.DTO.DTOForDoctors;
 using GraduationProject.DTO.DTOForWorkspace;
 using GraduationProject.DTO.DTOReview;
+using GraduationProject.DTO.Images;
+using GraduationProject.Migrations;
 using GraduationProject.Models;
 using GraduationProject.Services.AnalysisCentersServices;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +26,7 @@ namespace GraduationProject.Repository.AnalysisCentersRepository
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public int Create(AddAnalysisCentersDto dto, List<IFormFile> imageFiles)
+        public int Create(AddAnalysisCentersDto dto,  IFormFile file)
         {
             AnalysisCenters service = new AnalysisCenters();
             service.Name = dto.Name;
@@ -34,9 +38,11 @@ namespace GraduationProject.Repository.AnalysisCentersRepository
             service.EndWork = dto.EndWork;
             service.Latitude = dto.Latitude;
             service.Longitude = dto.Longitude;
+            service.LinkOfPlace = dto.LinkOfPlace;
             context.analysisCenters.Add(service);
+
             context.SaveChanges();
-            foreach (var file in imageFiles)
+            if (file != null)
             {
                 string fileName = file.FileName;
                 string filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\imgs"));
@@ -51,6 +57,7 @@ namespace GraduationProject.Repository.AnalysisCentersRepository
                 context.images.Add(image);
                 context.SaveChanges();
             }
+             
             return service.Id;
         }
 
@@ -114,16 +121,62 @@ namespace GraduationProject.Repository.AnalysisCentersRepository
                 analysisCenterDto.Latitude = analysisCenter.Latitude;
                 analysisCenterDto.Longitude = analysisCenter.Longitude;
                 analysisCenterDto.averageRate = analysisCenter.averageRate;
+                analysisCenterDto.LinkOfPlace = analysisCenter.LinkOfPlace;
+
                 analysisCenterDto.id = analysisCenter.Id;
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == analysisCenter.Id).
                     Where(i => i.serviceName == analysisCenter.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                analysisCenterDto.Images = imagesDto;
+                analysisCenterDto.Images = imagesDtos;
+                analysisCentersDto.Add(analysisCenterDto);
+            }
+            return analysisCentersDto;
+        }
+        public List<DtoService> GetAllAnalysisCenters2()
+        {
+            List<AnalysisCenters> analysisCenters = context.analysisCenters.ToList();
+            if (!analysisCenters.Any())
+                return null;
+            List<DtoService> analysisCentersDto = new List<DtoService>();
+            foreach (var analysisCenter in analysisCenters)
+            {
+                DtoService analysisCenterDto = new DtoService();
+                analysisCenterDto.Name = analysisCenter.Name;
+                analysisCenterDto.PhoneNumber = analysisCenter.PhoneNumber;
+                analysisCenterDto.City = analysisCenter.City;
+                analysisCenterDto.Street = analysisCenter.Street;
+                analysisCenterDto.DescriptionOfPlace = analysisCenter.DescriptionOfPlace;
+                analysisCenterDto.LinkOfPlace = analysisCenter.LinkOfPlace;
+                analysisCenterDto.StartWork = analysisCenter.StartWork;
+                analysisCenterDto.EndWork = analysisCenter.EndWork;
+                analysisCenterDto.Latitude = analysisCenter.Latitude;
+                analysisCenterDto.Longitude = analysisCenter.Longitude;
+ 
+                analysisCenterDto.id = analysisCenter.Id;
+                List<string> imagesDto = new List<string>();
+                List<Images> imgs = context.images.Where(i => i.ServicId == analysisCenter.Id).
+                    Where(i => i.serviceName == analysisCenter.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
+                foreach (var img in imgs)
+
+                {
+                    ImagesDto imageDto = new ImagesDto();
+                    HttpContext httpContext = httpContextAccessor.HttpContext;
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
+                }
+                analysisCenterDto.Images = imagesDtos;
                 analysisCentersDto.Add(analysisCenterDto);
             }
             return analysisCentersDto;
@@ -151,16 +204,22 @@ namespace GraduationProject.Repository.AnalysisCentersRepository
                 analysisCenterDto.Longitude = analysisCenter.Longitude;
                 analysisCenterDto.averageRate = analysisCenter.averageRate;
                 analysisCenterDto.id = analysisCenter.Id;
+ 
 
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == analysisCenter.Id).
                     Where(i => i.serviceName == analysisCenter.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                analysisCenterDto.Images = imagesDto;
+                analysisCenterDto.Images = imagesDtos;
                 analysisCentersDto.Add(analysisCenterDto);
             }
             return analysisCentersDto;
@@ -208,12 +267,17 @@ namespace GraduationProject.Repository.AnalysisCentersRepository
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == analysisCenter.Id).
                     Where(i => i.serviceName == analysisCenter.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                analysisCenterDto.Images = imagesDto;
+                analysisCenterDto.Images = imagesDtos;
                 analysisCentersDto.Add(analysisCenterDto);
             }
             return analysisCentersDto;
@@ -240,12 +304,17 @@ namespace GraduationProject.Repository.AnalysisCentersRepository
             List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == analysisCenter.Id).
                     Where(i => i.serviceName == analysisCenter.Name).ToList();
-                foreach (var img in imgs)
-                {
-                   HttpContext httpContext = httpContextAccessor.HttpContext;
-                  imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
-                } 
-                analysisCenterDto.Images = imagesDto;
+            List<ImagesDto> imagesDtos = new List<ImagesDto>();
+            foreach (var img in imgs)
+
+            {
+                ImagesDto imageDto = new ImagesDto();
+                HttpContext httpContext = httpContextAccessor.HttpContext;
+                imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                imageDto.id = img.Id;
+                imagesDtos.Add(imageDto);
+            }
+            analysisCenterDto.Images = imagesDtos;
             return analysisCenterDto;
         }
 
@@ -278,12 +347,17 @@ namespace GraduationProject.Repository.AnalysisCentersRepository
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == analysisCenter.Id).
                     Where(i => i.serviceName == analysisCenter.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                analysisCenterDto.Images = imagesDto;
+                analysisCenterDto.Images = imagesDtos;
                 analysisCentersDto.Add(analysisCenterDto);
             }
             return analysisCentersDto;

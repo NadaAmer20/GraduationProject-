@@ -1,4 +1,5 @@
-﻿using GraduationProject.DTO.DTOForWorkspace;
+﻿using GraduationProject.DTO;
+using GraduationProject.DTO.DTOForWorkspace;
 using GraduationProject.DTO.DTOPlayStation;
 using GraduationProject.DTO.DTOReview;
 using GraduationProject.DTO.SuperMarket;
@@ -10,10 +11,12 @@ namespace GraduationProject.Services.SuperMarketServices
 {
     public interface ISuperMarketServices
     {
-        int Create(AddSupermarketDto dto, List<IFormFile> file);
+        int Create(AddSupermarketDto dto, IFormFile file);
         void Delete(int id);
         void Update(int id, AddSupermarketDto dto, IFormFile file, int ImageId);
         List<SuperMarketDto> GetAllSuperMarket();
+        List<DtoService> GetAllSuperMarket2();
+
         List<SuperMarketDto> Search(string name);
         SuperMarketDto GetSuperMarketByID(int id);
         List<SuperMarketDto> GetAllSuperMarketDtoActiveNow();

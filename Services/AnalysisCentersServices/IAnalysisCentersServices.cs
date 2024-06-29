@@ -1,4 +1,5 @@
-﻿using GraduationProject.DTO.AnalysisCentersDto;
+﻿using GraduationProject.DTO;
+using GraduationProject.DTO.AnalysisCentersDto;
 using GraduationProject.DTO.DTOForWorkspace;
 using GraduationProject.DTO.DTOReview;
 using GraduationProject.DTO.SuperMarket;
@@ -10,10 +11,12 @@ namespace GraduationProject.Services.AnalysisCentersServices
 {
     public interface IAnalysisCentersServices
     {
-        int Create(AddAnalysisCentersDto dto, List<IFormFile> file);
+        int Create(AddAnalysisCentersDto dto, IFormFile file);
         void Delete(int id);
         void Update(int id, AddAnalysisCentersDto dto, IFormFile file, int ImageId);
         List<AnalysisCentersDto> GetAllAnalysisCenters();
+        List<DtoService> GetAllAnalysisCenters2();
+
         List<AnalysisCentersDto> Search(string name);
         AnalysisCentersDto GetAnalysisCenterByID(int id);
         List<AnalysisCentersDto> GetAllAnalysisCentersActiveNow();

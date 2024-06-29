@@ -1,4 +1,5 @@
-﻿using GraduationProject.DTO.DTOForDoctors;
+﻿using GraduationProject.DTO;
+using GraduationProject.DTO.DTOForDoctors;
 using GraduationProject.DTO.DTOForWorkspace;
 using GraduationProject.DTO.DTOReview;
 using GraduationProject.Models;
@@ -10,11 +11,13 @@ namespace GraduationProject.Services.WorkSpaceServices
     public interface IWorkspaceRepository
     {
        List<DTOOWorkspace> GetAllWorkspacs();
-       List<DTOOWorkspace> Search(string name);
+        List<DtoService> GetAllWorkspacs2();
+
+        List<DTOOWorkspace> Search(string name);
        DTOOWorkspace GetWorkSpaceByID(int id);
        List<DTOOWorkspace> GetAllWorkspacesActiveNow();
         List<Workspace> GetAllWorkspacesByReview();
-        int Create(AddWorkspaceDto dto, List<IFormFile> file);
+        int Create(AddWorkspaceDto dto, IFormFile file);
         void Delete(int id);
         void Update(int id, AddWorkspaceDto dto, IFormFile file, int ImageId);
         int CreateReview(string UserId, int WorkspaceId, DTOReview dTOReview);

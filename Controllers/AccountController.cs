@@ -52,7 +52,7 @@ namespace GraduationProject.Controllers
 
             return Ok(result);
         }
-        //[Authorize]
+   
         [HttpPost("login")] //api/Account/Login
         public async Task<IActionResult> Login([FromForm] Login userDto)
         {
@@ -91,19 +91,30 @@ namespace GraduationProject.Controllers
                         expires: DateTime.Now.AddDays(30),
                         signingCredentials: signing
                         );
+                       
 
-                        return Ok(new
+                         return Ok(new
                         {
                             token = new JwtSecurityTokenHandler().WriteToken(MyToken),
-                            expiration = MyToken.ValidTo
+                            Roles = new List<string>(roles)
                         });
                     }
+                    else
+                    {
+                        return new JsonResult(new { message = "الرجاء ادخال كلمه سر صحيحة" });
+                    }
+                }
+                else
+                {
+                    return new JsonResult(new { message = "هذا المستخدم غير موجود " });
                 }
 
-                return Unauthorized();
-            }
+
+             }
             return Unauthorized();
         }
+
+
         [HttpPost("ForgetPassword")]
 
         public async Task<IActionResult> ForgetPassword([FromForm] ForgetPassword _user)

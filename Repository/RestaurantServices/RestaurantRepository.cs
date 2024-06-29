@@ -1,5 +1,7 @@
-﻿ 
+﻿
+using GraduationProject.DTO;
 using GraduationProject.DTO.DTOForRestaurants;
+using GraduationProject.DTO.DTOForWorkspace;
 using GraduationProject.DTO.DTOPharmacies;
 using GraduationProject.DTO.DTOReview;
 using GraduationProject.DTO.Images;
@@ -32,7 +34,7 @@ namespace GraduationProject.Services
             context = _context;
             this.httpContextAccessor = httpContextAccessor;
         }
-        public int Create(AddRestaurantDto restaurantDto, List<IFormFile> imageFiles)
+        public int Create(AddRestaurantDto restaurantDto,  IFormFile file)
         {
             Menu menu = new Menu();
             context.Menus.Add(menu);
@@ -53,7 +55,7 @@ namespace GraduationProject.Services
             };
             context.Restaurants.Add(restaurant);
             context.SaveChanges();
-            foreach (var file in imageFiles)
+            if (file != null)
             {
                 string fileName = file.FileName;
                 string filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\imgs"));
@@ -106,10 +108,13 @@ namespace GraduationProject.Services
             service.City = dto.City;
             service.Street = dto.Street;
             service.DescriptionOfPlace = dto.DescriptionOfPlace;
+            service.LinkOfPlace = dto.LinkOfPlace;
             service.StartWork = dto.StartWork;
             service.EndWork = dto.EndWork;
             service.Latitude = dto.Latitude;
             service.Longitude = dto.Longitude;
+            service.Email = dto.Email;
+            service.HasDelivery = dto.HasDelivery;
             context.SaveChanges();
             var img = context.images.FirstOrDefault(m => m.Id == ImageId);
             string fileName = file.FileName;
@@ -181,17 +186,19 @@ namespace GraduationProject.Services
                List<string> imagesDto = new List<string>();
             List<Images> imgs = context.images.Where(i => i.ServicId == id).
                 Where(i => i.serviceName ==  restaurant.Name).ToList();
+            List<ImagesDto> imagesDtos = new List<ImagesDto>();
             foreach (var img in imgs)
 
             {
-                //  ImagesDto imageDto = new ImagesDto();
-                // imageDto.Image = img.Image;
+                ImagesDto imageDto = new ImagesDto();
                 HttpContext httpContext = httpContextAccessor.HttpContext;
-                imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                imageDto.id = img.Id;
+                imagesDtos.Add(imageDto);
             }
-             rest.Images = imagesDto;
-         
-                rest.DescriptionOfPlace = restaurant.DescriptionOfPlace;
+            rest.Images = imagesDtos;
+ 
+            rest.DescriptionOfPlace = restaurant.DescriptionOfPlace;
                 rest.LinkOfPlace = restaurant.LinkOfPlace;
                List<MenuItemsDto> menuItems = new List<MenuItemsDto>();
                foreach (var item in restaurant.menu.menuItems)
@@ -234,13 +241,18 @@ namespace GraduationProject.Services
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == restaurant.RestaurantId).
                 Where(i => i.serviceName == restaurant.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                rest.Images = imagesDto;
-                rest.DescriptionOfPlace = restaurant.DescriptionOfPlace;
+                rest.Images = imagesDtos;
+                 rest.DescriptionOfPlace = restaurant.DescriptionOfPlace;
                 rest.LinkOfPlace = restaurant.LinkOfPlace;
                 List<MenuItemsDto> menuItems = new List<MenuItemsDto>();
                 foreach (var item in restaurant.menu.menuItems)
@@ -257,6 +269,46 @@ namespace GraduationProject.Services
                     menuItems.Add(menuItem);
                 }
                 rest.menuItems = menuItems;
+                RestaurantsDto.Add(rest);
+            }
+            return RestaurantsDto;
+        }
+        public List<DtoService> getAll2()
+        {
+            List<Restaurant> restaurants = context.Restaurants.
+                Include(r => r.menu.menuItems).ToList();
+            if (!restaurants.Any())
+                return null;
+            List<DtoService> RestaurantsDto = new List<DtoService>();
+            foreach (var restaurant in restaurants)
+            {
+                DtoService rest = new DtoService();
+                rest.City = restaurant.City;
+                rest.Street = restaurant.Street;
+                
+                //rest.Phone = restaurant.Phone;
+                rest.Name = restaurant.Name;
+                rest.Latitude = restaurant.Latitude;
+                rest.Longitude = restaurant.Longitude;
+                rest.StartWork = restaurant.StartWork;
+                rest.EndWork = restaurant.EndWork;
+                rest.id = restaurant.RestaurantId;
+                List<string> imagesDto = new List<string>();
+                List<Images> imgs = context.images.Where(i => i.ServicId == restaurant.RestaurantId).
+                Where(i => i.serviceName == restaurant.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
+                foreach (var img in imgs)
+
+                {
+                    ImagesDto imageDto = new ImagesDto();
+                    HttpContext httpContext = httpContextAccessor.HttpContext;
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
+                }
+                rest.Images = imagesDtos;
+                rest.DescriptionOfPlace = restaurant.DescriptionOfPlace;
+                rest.LinkOfPlace = restaurant.LinkOfPlace;
                 RestaurantsDto.Add(rest);
             }
             return RestaurantsDto;
@@ -290,13 +342,18 @@ namespace GraduationProject.Services
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == restaurant.RestaurantId).
                 Where(i => i.serviceName == restaurant.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                rest.Images = imagesDto;
-                rest.DescriptionOfPlace = restaurant.DescriptionOfPlace;
+                rest.Images = imagesDtos;
+                 rest.DescriptionOfPlace = restaurant.DescriptionOfPlace;
                 rest.LinkOfPlace = restaurant.LinkOfPlace;
                 List<MenuItemsDto> menuItems = new List<MenuItemsDto>();
                 foreach (var item in restaurant.menu.menuItems)
@@ -420,13 +477,18 @@ namespace GraduationProject.Services
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == restaurant.RestaurantId).
                     Where(i => i.serviceName == restaurant.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                rest.Images = imagesDto;
-                rest.DescriptionOfPlace = restaurant.DescriptionOfPlace;
+                rest.Images = imagesDtos;
+                 rest.DescriptionOfPlace = restaurant.DescriptionOfPlace;
                 rest.LinkOfPlace = restaurant.LinkOfPlace;
                 RestaurantsDto.Add(rest);
             }

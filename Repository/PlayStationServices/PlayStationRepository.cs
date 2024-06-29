@@ -1,4 +1,5 @@
-﻿using GraduationProject.DTO.DTOForWorkspace;
+﻿using GraduationProject.DTO;
+using GraduationProject.DTO.DTOForWorkspace;
 using GraduationProject.DTO.DTOPharmacies;
 using GraduationProject.DTO.DTOPlayStation;
 using GraduationProject.DTO.DTOReview;
@@ -26,7 +27,7 @@ namespace GraduationProject.Services.PlayStationServices
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public int Create(AddPlaystationDto dto, List<IFormFile> imageFiles)
+        public int Create(AddPlaystationDto dto,  IFormFile file)
         {
             PlayStation service = new PlayStation();
             service.Name = dto.Name;
@@ -41,7 +42,7 @@ namespace GraduationProject.Services.PlayStationServices
             service.Longitude = dto.Longitude;
             context.playStations.Add(service);
             context.SaveChanges();
-            foreach (var file in imageFiles)
+            if (file != null)
             {
                 string fileName = file.FileName;
                 string filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\imgs"));
@@ -56,7 +57,7 @@ namespace GraduationProject.Services.PlayStationServices
                 context.images.Add(image);
                 context.SaveChanges();
             }
-            return service.Id;
+             return service.Id;
         }
 
         public void Delete(int id)
@@ -156,15 +157,18 @@ namespace GraduationProject.Services.PlayStationServices
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == st.Id).
                     Where(i => i.serviceName == st.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
-                    //  ImagesDto imageDto = new ImagesDto();
-                    // imageDto.Image = img.Image;
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTR.Images = imagesDto;
-                List<DTOGames> games = new List<DTOGames>();
+                dTR.Images = imagesDtos;
+                 List<DTOGames> games = new List<DTOGames>();
                 foreach (var gm in st.games)
                 {
                     DTOGames dTOGames = new DTOGames();
@@ -175,6 +179,47 @@ namespace GraduationProject.Services.PlayStationServices
                     games.Add(dTOGames);
                 }
                 dTR.dTOGames = games;
+                dTOPlayStations.Add(dTR);
+            }
+
+            return dTOPlayStations;
+        }
+
+        public List<DtoService> GetAllPlayStations2()
+        {
+            List<PlayStation> playStations = context.playStations.Include(r => r.games).ToList();
+            if (!playStations.Any())
+                return null;
+            List<DtoService> dTOPlayStations = new List<DtoService>();
+            foreach (var st in playStations)
+            {
+                DtoService dTR = new DtoService();
+                dTR.Name = st.Name;
+                dTR.Street = st.Street;
+                dTR.City = st.City;
+                dTR.DescriptionOfPlace = st.DescriptionOfPlace;
+                dTR.LinkOfPlace = st.LinkOfPlace;
+                dTR.PhoneNumber = st.PhoneNumber;
+                dTR.StartWork = st.StartWork;
+                dTR.EndWork = st.EndWork;
+                dTR.Longitude = st.Longitude;
+                dTR.Latitude = st.Latitude;
+                dTR.id = st.Id;
+                List<string> imagesDto = new List<string>();
+                List<Images> imgs = context.images.Where(i => i.ServicId == st.Id).
+                    Where(i => i.serviceName == st.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
+                foreach (var img in imgs)
+
+                {
+                    ImagesDto imageDto = new ImagesDto();
+                    HttpContext httpContext = httpContextAccessor.HttpContext;
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
+                }
+                dTR.Images = imagesDtos;
+               
                 dTOPlayStations.Add(dTR);
             }
 
@@ -226,14 +271,17 @@ namespace GraduationProject.Services.PlayStationServices
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == st.Id).
                     Where(i => i.serviceName == st.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
-                    //  ImagesDto imageDto = new ImagesDto();
-                    // imageDto.Image = img.Image;
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTR.Images = imagesDto;
+                dTR.Images = imagesDtos;
                 List<DTOGames> games = new List<DTOGames>();
                 foreach (var gm in st.games)
                 {
@@ -274,14 +322,17 @@ namespace GraduationProject.Services.PlayStationServices
             List<string> imagesDto = new List<string>();
             List<Images> imgs = context.images.Where(i => i.ServicId == st.Id).
                 Where(i => i.serviceName == st.Name).ToList();
+            List<ImagesDto> imagesDtos = new List<ImagesDto>();
             foreach (var img in imgs)
+
             {
-                //  ImagesDto imageDto = new ImagesDto();
-                // imageDto.Image = img.Image;
+                ImagesDto imageDto = new ImagesDto();
                 HttpContext httpContext = httpContextAccessor.HttpContext;
-                imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                imageDto.id = img.Id;
+                imagesDtos.Add(imageDto);
             }
-            dTR.Images = imagesDto;
+            dTR.Images = imagesDtos;
             List<DTOGames> games = new List<DTOGames>();
                 foreach (var gm in st.games)
                 {
@@ -325,14 +376,17 @@ namespace GraduationProject.Services.PlayStationServices
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == st.Id).
                     Where(i => i.serviceName == st.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
-                    //  ImagesDto imageDto = new ImagesDto();
-                    // imageDto.Image = img.Image;
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTR.Images = imagesDto;
+                dTR.Images = imagesDtos;
                 List<DTOGames> games = new List<DTOGames>();
                 foreach (var gm in st.games)
                 {

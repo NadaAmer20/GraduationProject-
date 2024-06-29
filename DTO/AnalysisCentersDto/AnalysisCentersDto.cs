@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System;
 using System.Collections.Generic;
+using GraduationProject.DTO.Images;
 
 namespace GraduationProject.DTO.AnalysisCentersDto
 {
@@ -17,7 +18,7 @@ namespace GraduationProject.DTO.AnalysisCentersDto
         public DateTime EndWork { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-        public List<string> Images { get; set; }
+        public List<ImagesDto> Images { get; set; }
 
         public int? averageRate { get; set; }
 

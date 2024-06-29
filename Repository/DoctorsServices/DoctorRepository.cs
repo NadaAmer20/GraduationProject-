@@ -1,4 +1,5 @@
 ﻿using EO.Internal;
+using GraduationProject.DTO;
 using GraduationProject.DTO.DTOForDoctors;
 using GraduationProject.DTO.DTOForWorkspace;
 using GraduationProject.DTO.DTOPharmacies;
@@ -25,7 +26,7 @@ namespace GraduationProject.Services.DoctorsServices
         {
             this.httpContextAccessor = httpContextAccessor;
         }
-        public int Add(AddDoctorDto doctorDto, List<IFormFile> imageFiles)
+        public int Add(AddDoctorDto doctorDto ,  IFormFile file)
         {
             Doctor doctor = new Doctor();
             doctor.Name = doctorDto.Name;
@@ -42,8 +43,7 @@ namespace GraduationProject.Services.DoctorsServices
             doctor.LinkOfPlace = doctorDto.LinkOfPlace;
             context.Doctors.Add(doctor);
             context.SaveChanges();
-            List<Images> images = new List<Images>();
-            foreach (var file in imageFiles)
+           if(file!=null)
             {
                 string fileName = file.FileName;
                 string filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\imgs"));
@@ -57,8 +57,9 @@ namespace GraduationProject.Services.DoctorsServices
                 image.ServicId = doctor.Id;
                 context.images.Add(image);
                 context.SaveChanges();
-                images.Add(image);
+
             }
+
             return doctor.Id;
         }
        
@@ -76,6 +77,7 @@ namespace GraduationProject.Services.DoctorsServices
             context.SaveChanges();
 
         }
+        
         public void Update(int id,  AddDoctorDto doctor, IFormFile file, int ImageId)
         {
             var OldDoctor = context.Doctors.FirstOrDefault(d => d.Id == id);
@@ -109,8 +111,7 @@ namespace GraduationProject.Services.DoctorsServices
 
         public List<DTODoctor> GetAllDectors()
         {
-            HttpContext httpContext = httpContextAccessor.HttpContext;
-            var doctors = context.Doctors.ToList();
+             var doctors = context.Doctors.ToList();
              List<DTODoctor> dTODoctors = new List<DTODoctor>();
              if (!doctors.Any()  )
                 return null;
@@ -132,12 +133,55 @@ namespace GraduationProject.Services.DoctorsServices
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == doctor.Id).
                     Where(i => i.serviceName == doctor.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
-                    
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    ImagesDto imageDto = new ImagesDto();
+                    HttpContext httpContext = httpContextAccessor.HttpContext;
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTODoctor.Images = imagesDto;
+                dTODoctor.Images = imagesDtos;
+                dTODoctors.Add(dTODoctor);
+            }
+            return dTODoctors;
+        }
+        public List<DtoService> GetAllDectors2()
+        {
+            var doctors = context.Doctors.ToList();
+            List<DtoService> dTODoctors = new List<DtoService>();
+            if (!doctors.Any())
+                return null;
+            foreach (var doctor in doctors)
+            {
+                DtoService dTODoctor = new DtoService();
+                dTODoctor.Name = doctor.Name;
+                dTODoctor.Street = doctor.Street;
+                dTODoctor.City = doctor.City;
+                dTODoctor.StartWork = doctor.StartWork;
+                dTODoctor.EndWork = doctor.EndWork;
+                dTODoctor.Latitude = doctor.Latitude;
+                dTODoctor.Longitude = doctor.Longitude;
+                dTODoctor.PhoneNumber = doctor.PhoneNumber;
+                dTODoctor.DescriptionOfPlace = doctor.DescriptionOfPlace;
+                dTODoctor.LinkOfPlace = doctor.LinkOfPlace;
+                dTODoctor.id = doctor.Id;
+                List<string> imagesDto = new List<string>();
+                List<Images> imgs = context.images.Where(i => i.ServicId == doctor.Id).
+                    Where(i => i.serviceName == doctor.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
+                foreach (var img in imgs)
+
+                {
+                    ImagesDto imageDto = new ImagesDto();
+                    HttpContext httpContext = httpContextAccessor.HttpContext;
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
+                }
+                dTODoctor.Images = imagesDtos;
                 dTODoctors.Add(dTODoctor);
             }
             return dTODoctors;
@@ -196,8 +240,7 @@ namespace GraduationProject.Services.DoctorsServices
         }
         public DTODoctor GetDoctorById(int id)
         {
-            HttpContext httpContext = httpContextAccessor.HttpContext; 
-            var doctor = context.Doctors.SingleOrDefault(d => d.Id == id);
+             var doctor = context.Doctors.SingleOrDefault(d => d.Id == id);
             if (doctor == null)
                 return null;
             DTODoctor dTODoctor = new DTODoctor();
@@ -217,21 +260,23 @@ namespace GraduationProject.Services.DoctorsServices
             List<string> imagesDto = new List<string>();
             List<Images> imgs = context.images.Where(i => i.ServicId == doctor.Id).
                 Where(i => i.serviceName == doctor.Name).ToList();
+            List<ImagesDto> imagesDtos = new List<ImagesDto>();
             foreach (var img in imgs)
 
             {
-                //  ImagesDto imageDto = new ImagesDto();
-                // imageDto.Image = img.Image;
-                imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                ImagesDto imageDto = new ImagesDto();
+                HttpContext httpContext = httpContextAccessor.HttpContext;
+                imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                imageDto.id = img.Id;
+                imagesDtos.Add(imageDto);
             }
-            dTODoctor.Images = imagesDto; 
+            dTODoctor.Images = imagesDtos;
             return dTODoctor;
         }
 
         public List<DTODoctor> Search(string name)
         {
-            HttpContext httpContext = httpContextAccessor.HttpContext;
-            List<Doctor> doctors = context.Doctors.ToList();
+             List<Doctor> doctors = context.Doctors.ToList();
             if (!doctors.Any())
                 return null;
             List<DTODoctor> dTODoctors = new List<DTODoctor>();
@@ -260,13 +305,17 @@ namespace GraduationProject.Services.DoctorsServices
                     List<string> imagesDto = new List<string>();
                     List<Images> imgs = context.images.Where(i => i.ServicId == doctor.Id).
                         Where(i => i.serviceName == doctor.Name).ToList();
+                    List<ImagesDto> imagesDtos = new List<ImagesDto>();
                     foreach (var img in imgs)
+
                     {
-                        //  ImagesDto imageDto = new ImagesDto();
-                        // imageDto.Image = img.Image;
-                        imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                        ImagesDto imageDto = new ImagesDto();
+                        HttpContext httpContext = httpContextAccessor.HttpContext;
+                        imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                        imageDto.id = img.Id;
+                        imagesDtos.Add(imageDto);
                     }
-                    dTODoctor.Images = imagesDto;
+                    dTODoctor.Images = imagesDtos;
                     dTODoctors.Add(dTODoctor);
                 }
             }
@@ -275,8 +324,7 @@ namespace GraduationProject.Services.DoctorsServices
 
             public List<DTODoctor> searchByNameOfSpecialization(string name)
         {
-            HttpContext httpContext = httpContextAccessor.HttpContext;
-            List<Doctor>  doctors = context.Doctors.
+             List<Doctor>  doctors = context.Doctors.
                 Where(d => d.Specialization == name).ToList();
             if (!doctors.Any())
                 return null;
@@ -300,13 +348,17 @@ namespace GraduationProject.Services.DoctorsServices
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == doctor.Id).
                     Where(i => i.serviceName == doctor.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
-                { 
-                    //  ImagesDto imageDto = new ImagesDto();
-                    // imageDto.Image = img.Image;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+
+                {
+                    ImagesDto imageDto = new ImagesDto();
+                    HttpContext httpContext = httpContextAccessor.HttpContext;
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTODoctor.Images = imagesDto;
+                dTODoctor.Images = imagesDtos;
                 dTODoctors.Add(dTODoctor);
             }
             return dTODoctors;
@@ -339,14 +391,17 @@ namespace GraduationProject.Services.DoctorsServices
                 List<string> imagesDto = new List<string>();
                 List<Images> imgs = context.images.Where(i => i.ServicId == doctor.Id).
                     Where(i => i.serviceName == doctor.Name).ToList();
+                List<ImagesDto> imagesDtos = new List<ImagesDto>();
                 foreach (var img in imgs)
+
                 {
-                    //  ImagesDto imageDto = new ImagesDto();
-                    // imageDto.Image = img.Image
+                    ImagesDto imageDto = new ImagesDto();
                     HttpContext httpContext = httpContextAccessor.HttpContext;
-                    imagesDto.Add($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}");
+                    imageDto.Image = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/imgs/{img.Image}";
+                    imageDto.id = img.Id;
+                    imagesDtos.Add(imageDto);
                 }
-                dTODoctor.Images = imagesDto;
+                dTODoctor.Images = imagesDtos;
                 dTODoctors.Add(dTODoctor);
             }
             return dTODoctors;

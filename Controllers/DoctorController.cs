@@ -19,7 +19,7 @@ namespace GraduationProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   // [Authorize]
+    [Authorize]
     public class DoctorController : ControllerBase
     {
 
@@ -34,30 +34,31 @@ namespace GraduationProject.Controllers
 
 
         //Add,,delete,update for doctor.............................................................................
-       [Authorize(Roles = "Admin")]
+      [Authorize(Roles = "Admin")]
+     
         [HttpPost("AddDoctor")]
-        public ActionResult AddDoctor([FromBody] AddDoctorDto doctor, List<IFormFile> imageFiles)
+        public ActionResult AddDoctor([FromForm] AddDoctorDto doctor,IFormFile?  files)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            doctorRepository.Add(doctor, imageFiles);
-            return Ok("Add is Done");
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpPut("UpdateDoctor")]
-        public ActionResult Update(int id, [FromBody] AddDoctorDto doctor , IFormFile file,int ImageId)
-        {
-            doctorRepository.Update(id,  doctor ,file, ImageId);
-            return Ok("Update Doctor Done");
+            doctorRepository.Add(doctor,files);
+            return new JsonResult(new { message = "تمت الاضافه بنجاح" });
         }
 
         [Authorize(Roles = "Admin")]
-        //  [Authorize(Roles = UserRoles.Admin )]
+        [HttpPut("UpdateDoctor")]
+        public ActionResult Update(int id, [FromForm] AddDoctorDto doctor , IFormFile file,int ImageId)
+        {
+            doctorRepository.Update(id,  doctor ,file, ImageId);
+            return new JsonResult(new { message = "تم التعديل بنجاح" });
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpDelete("DeleteDoctor")]
         public IActionResult Delete(int id)
         {
             doctorRepository.Delete(id);
-            return Ok("Delete Doctor Done");
+            return new JsonResult(new { message = "تم الحذف بنجاح" });
         }
 
         [HttpGet("GetAllDoctors")]
@@ -65,6 +66,14 @@ namespace GraduationProject.Controllers
         {
             List<DTODoctor> doctors = doctorRepository.GetAllDectors();
             if(doctors==null)
+                return BadRequest("There is No Data");
+            return Ok(doctors);
+        }
+        [HttpGet("GetAllDoctors2")]
+        public IActionResult GetAllDoctors2()
+        {
+            var doctors = doctorRepository.GetAllDectors2();
+            if (doctors == null)
                 return BadRequest("There is No Data");
             return Ok(doctors);
         }
@@ -76,7 +85,7 @@ namespace GraduationProject.Controllers
                 return BadRequest("There is No Data");
             return Ok(doctors);
         }
-        [HttpPost("GetDoctorById")]//route
+        [HttpGet("GetDoctorById")]//route
         //[Authorize(Roles = UserRoles.Admin)]
         public ActionResult GetDoctorById(int id)
         {
@@ -87,9 +96,9 @@ namespace GraduationProject.Controllers
         }
 
 
-        [HttpPost("Search")]
+        [HttpGet("Search")]
         //  [Authorize(Roles = UserRoles.Admin )]
-        public ActionResult Search([FromForm] string name)
+        public ActionResult Search(  string name)
         {
             List<DTODoctor> doctor = doctorRepository.Search(name);
             if (doctor == null)
@@ -111,7 +120,7 @@ namespace GraduationProject.Controllers
         //Review............................................................................
 
         [HttpPost("CreateReviewForDoctor")]
-        public async Task<IActionResult> CreateReview(int DoctorId, [FromForm] DTOReview dTOReview)//,  IFormFile file)
+        public async Task<IActionResult> CreateReview(int DoctorId, [FromBody] DTOReview dTOReview)//,  IFormFile file)
         {
             User user = await usermanger.GetUserAsync(User);
             var id = doctorRepository.CreateReview(user.Id,DoctorId, dTOReview);
@@ -120,7 +129,7 @@ namespace GraduationProject.Controllers
 
 
         [HttpPut("UpdateReview")]
-        public ActionResult UpdateReview(int DoctorId, [FromForm] DTOReview dTOReview)//, IFormFile file)
+        public ActionResult UpdateReview(int DoctorId, [FromBody] DTOReview dTOReview)//, IFormFile file)
         {
             doctorRepository.UpdateReview(DoctorId, dTOReview);//,file);
             return Ok("Update Review Done");

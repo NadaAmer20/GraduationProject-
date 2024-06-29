@@ -29,9 +29,9 @@ namespace GraduationProject.DTO.DTOForRestaurants
         public DateTime StartWork { get; set; }
 
         public DateTime EndWork { get; set; }
-        public List<string> Images { get; set; }
+        public List<ImagesDto> Images { get; set; }
 
-       // public List<DTOCategory> dTOCategories { get; set; }
-    
+        // public List<DTOCategory> dTOCategories { get; set; }
+
     }
 }
